@@ -48,120 +48,128 @@ public class Main
         
     }
     
-    public static class internalStatus(){
-        int virus; // disease outbreak
-        int terrorists; // terrorists inside the country
-        int immigration; // migrant crisis
-        int organized; // organized crime;
+    public static class crisisSit{
         
-        int virusKnown;
-        int terroristsKnown;
-        int immigrationKnown;
-        int organizedKnown;
+        String name;
+        int actual;
+        int known;
         
-        public internalStatus(){
-            virus = ra.nextInt(5)+1;
-            terrorists = ra.nextInt(5)+1;
-            immigration = ra.nextInt(5)+1;
-            organized = ra.nextInt(5)+1;
+        Map<Integer, String> report = new HashMap<>();
+        
+        
+        public crisisSit(String name){
+            this.name = name;
+            actual = ra.nextInt(5)+1;
+        }
+        
+        public HashMap<Integer, String> getReportList(){ return report;}
+        public String getName(){return name;}
+        public int getActual(){return actual;}
+        public int getKnown(){return known;}
+        
+        public String displayReport(){return report.get(known);}
+        
+        public void addToReportList(int lev, String desc){
+            report.put(lev,desc);
+        }
+        
+        public void determineKnown(Advisor adv){
+            for(int i=0; i<5;i++){
+                known+= (adv.competenceFlip())? 1:0;
+                if(i >= actual){
+                    if(competenceFlip()){
+                        break;
+                    }
+                }
+            }
+            known ++;
+            
+            known = Math.min(5. known);
+            known = Math.max(1, known);
+        }
+    }
+    
+    public static class departmentStatus(){
+        Advisor adv;
+        
+        List<crisisSit> situations = new ArrayList<>();
+        
+        public departmentStatus(Advisor adv){
+            this.adv = adv;
+        }
+        
+        public void addSituation(crisisSit newSit){
+            situations.add(newSit);
         }
         
         public void determineReportQuality(){
-            for(int i=0; i<virus;i++){
-                virusKnown += (advInternal.competenceFlip())? 1:0;
-                
+            for(crisisSit sit : situations){
+                sit.determineKnown();
             }
-            virusKnown++;
-            
-            if(advInternal.isHeJudas()){
-                virusKnown += ra.nextInt(5);
-            }
-            
-            for(int i=0; i<terrorists;i++){
-                terroristsKnown += (advInternal.competenceFlip())? 1:0;
-                
-            }
-            terroristsKnown++;
-            if(advInternal.isHeJudas()){
-                terroristsKnown += ra.nextInt(5);
-            }
-            for(int i=0; i<immigration;i++){
-                immigrationKnown += (advInternal.competenceFlip())? 1:0;
-                
-            }
-            immigrationKnown++;
-            if(advInternal.isHeJudas()){
-                immigrationKnown += ra.nextInt(5);
-            }
-            
-            for(int i=0; i<organized;i++){
-                organizedKnown += (advInternal.competenceFlip())? 1:0;
-                
-            }
-            organizedKnown++;
-            if(advInternal.isHeJudas()){
-                organizedKnown += ra.nextInt(5);
-            }
-            
-            virusKnown = Math.min(virusKnown,5);
-            terroristsKnown = Math.min(terroristsKnown,5);
-            immigrationKnown = Math.min(immigrationKnown,5);
-            organizedKnown = Math.min(organizedKnown,5);
-            
-            virusKnown = Math.max(virusKnown,1);
-            terroristsKnown = Math.max(terroristsKnown,1);
-            immigrationKnown = Math.max(immigrationKnown,1);
-            organizedKnown = Math.max(organizedKnown,1);
-            
-            
             
         }
         
         public void displayReport(){
-            Map<int, String> virusReport = new HashMap<>();
-            virusReport.put(1, "There is currently no health emergency");
-            virusReport.put(2, "There are minor reports of a localized virus epidemic");
-            virusReport.put(3, "Reports indicate viral epidemics across multiple population centers");
-            virusReport.put(4, "Reports indicate a nationwide viral epidemic");
-            virusReport.put(5, "We are currently experiencing a nationwide viral crisis");
+            for(crisisSit sit: situations){
+                sit.displayReport();
+            }
+        }
+        
+        public static void recommendAction(){
+            int maxConcern = Integer.MIN_VALUE;
+            crisisSit maxSit = null;
+            for(crisisSit sit: situations){
+                int curpo = sit.getKnown();
+                if(curpo > maxConcern){
+                    maxSit = sit;
+                    maxConcern = curpo;
+                }
+            }
             
-            Map<int, String> terroristReport = new HashMap<>();
-            terroristReport.put(1, "There are currently no internal terrorist threats");
-            terroristReport.put(2, "Reports indicate minor suspicious activities by some groups");
-            terroristReport.put(3, "Internal intelligence suggests terroristic activities in some regions");
-            terroristReport.put(4, "There are reports of a localized terrorist network ");
-            terroristReport.put(5, "There is currently a nationwide terrorist organization");
-            
-            Map<int, String> immigrationReport= new HashMap<>();
-            immigrationReport.put(1, "There are no indications of any migrant crisis");
-            immigrationReport.put(2, "There are localized reports of illegal border crossings");
-            immigrationReport.put(3, "There are various reports of undocument immigrants across border regions");
-            immigrationReport.put(4, "Widespread reports indicate a significant influx of undocumented immigrants");
-            immigrationReport.put(5, "We are currently experiencing a nationwide migrant crisis;");
-            
-            Map<int, String> organizedReport= new HashMap<>();
-            organizedReport.put(1, "Internal intelligence suggests no major crime organization has emerged");
-            organizedReport.put(2, "There are minor incidences of localized racketeering and smuggling rings");
-            organizedReport.put(3, "Internal intelligence suggests various localized crime syndicates in various regions");
-            organizedReport.put(4, "Reports highly indicate a major crime syndicate is active");
-            organizedReport.put(5, "There is currently a nationwide organized crime syndicate running rampant in our nation");
-            
-            
-            
-            System.out.println(virusReport.get(virusKnown));
-            System.out.println(terroristReport.get(terroristsKnown));
-            System.out.println(immigrationReport.get(immigrationKnown));
-            System.out.println(organizedReport.get(organizedKnown));
-            
+            if(maxConcern ==1){
+                System.out.println("No actions recommended for now");
+            }else{
+                System.out.println("I recommend taking action here: ");
+                System.out.println(maxSit.getName()+ ": "+ maxSit.displayReport());
+                
+                
+                System.out.println("Do it? (y / n (default) )");
+                String ans = sc.nextLine();
+                if(ans.equalsIgnoreCase("y")){
+                    
+                    int timer = Math.max(((100-adv.getCompetence())/10),1);
+                    actionqueue.add(new Action(maxSit, adv, timer) );
+                }
+            }
         }
     }
     
     public static class Action{
-        String desc;
-        int year,week;
+        crisisSit targetSit;
+        Advisor adv;
+        int timer;
         
+        public Action(crisisSit targetSit, Advisor adv, int timer){
+            this.targetSit = targetSit;
+            this.adv = adv;
+            this.timer = timer;
+        }
+        
+        public boolean getResult(){
+            return adv.competenceFlip();
+        }
+        
+        public void countDown(){
+            timer--;
+        }
+        
+        public void displaySelf(){
+            System.out.println("Action on " + targetSit.getName()+ " | Recommended by "+ adv.getName()+ " | Completed in "+ timer+ ((timer>1)?" weeks":" week"));
+        }
         
     }
+    
+    public static List<Action> actionqueue = new ArrayList<>();
     
 	public static void main(String[] args) {
 		System.out.println("Hello World");
